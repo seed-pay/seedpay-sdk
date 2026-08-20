@@ -1,5 +1,6 @@
 {
   "name": "@seedpay/sdk",
+  "homepage": "https://seedpay.app",
   "version": "0.0.3",
   "sideEffects": false,
   "type": "module",
@@ -24,7 +25,6 @@
     "base58-js": "^3.0.3",
     "big.js": "^7.0.1",
     "bitcoin-address-validation": "^3.0.0",
-    "gill": "^0.14.0",
     "ufo": "^1.6.4",
     "uuid": "^14.0.1",
     "valibot": "^1.4.2",

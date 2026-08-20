@@ -1,17 +1,16 @@
-import { Network, validate as validateBTC } from 'bitcoin-address-validation'
-import { isAddress as validateSOL } from 'gill/browser'
-import { isAddress as validateEVM } from 'viem'
+import { Network, validate } from 'bitcoin-address-validation'
+import { isAddress } from 'viem'
 
+import { isSolanaAddress, isTronAddress } from './address'
 import { ASSETS, ChainEnum } from './assets'
-import { isAddress as validateTRX } from './tron'
 
 import type { AssetId, Chain } from './types'
 
 export const validateAddress = (address: string, chain: Chain): boolean => {
-  if (chain === ChainEnum.BTC) return validateBTC(address, Network.mainnet)
-  if (chain === ChainEnum.SOL) return validateSOL(address)
-  if (chain === ChainEnum.TRX) return validateTRX(address)
-  return !!validateEVM(address)
+  if (chain === ChainEnum.BTC) return validate(address, Network.mainnet)
+  if (chain === ChainEnum.SOL) return isSolanaAddress(address)
+  if (chain === ChainEnum.TRX) return isTronAddress(address)
+  return !!isAddress(address)
 }
 
 export const keys = <T extends object>(obj: T) => Object.keys(obj) as (keyof T)[]
