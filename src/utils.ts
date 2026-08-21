@@ -1,3 +1,4 @@
+import { checkAddress } from '@polkadot/util-crypto'
 import { Network, validate } from 'bitcoin-address-validation'
 import { isAddress } from 'viem'
 
@@ -10,6 +11,7 @@ export const validateAddress = (address: string, chain: Chain): boolean => {
   if (chain === ChainEnum.BTC) return validate(address, Network.mainnet)
   if (chain === ChainEnum.SOL) return isSolanaAddress(address)
   if (chain === ChainEnum.TRX) return isTronAddress(address)
+  if (chain === ChainEnum.DOT) return checkAddress(address, 0)[0]
   return !!isAddress(address)
 }
 

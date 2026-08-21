@@ -8,6 +8,7 @@ export enum ChainEnum {
   ARB = 3,
   SOL = 4,
   TRX = 5,
+  DOT = 6,
 }
 
 export const ASSETS = {
@@ -112,6 +113,30 @@ export const ASSETS = {
     decimals: 18,
     symbol: 'ETH',
     name: 'Ethereum',
+    address: ethAddress,
+    standard: 'native',
+  },
+  'DOT.USDT': {
+    chain: ChainEnum.DOT,
+    decimals: 6,
+    symbol: 'USDT',
+    name: 'Tether',
+    address: '1984',
+    standard: 'pallet-asset',
+  },
+  'DOT.USDC': {
+    chain: ChainEnum.DOT,
+    decimals: 6,
+    symbol: 'USDC',
+    name: 'USD Coin',
+    address: '1337',
+    standard: 'pallet-asset',
+  },
+  'DOT.DOT': {
+    chain: ChainEnum.DOT,
+    decimals: 10,
+    symbol: 'DOT',
+    name: 'Polkadot',
     address: ethAddress,
     standard: 'native',
   },

@@ -20,6 +20,7 @@ const CHAINFLIP_CHAINS: Record<ChainEnum, string> = {
   [ChainEnum.ARB]: 'Arbitrum',
   [ChainEnum.SOL]: 'Solana',
   [ChainEnum.TRX]: 'Tron',
+  [ChainEnum.DOT]: 'Assethub',
 }
 
 const CHAINS_MAP: Record<string, string> = {
@@ -28,6 +29,7 @@ const CHAINS_MAP: Record<string, string> = {
   Arbitrum: 'ARB',
   Solana: 'SOL',
   Tron: 'TRX',
+  Assethub: 'DOT',
 }
 
 const mapChainflipAsset = (asset: AssetId) => ({
