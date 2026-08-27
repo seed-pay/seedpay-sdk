@@ -9,7 +9,7 @@ import type { Address } from 'viem'
 
 export const asset = v.picklist(ASSET_LIST)
 export const destAssetId = v.picklist(DESTINATION_ASSETS)
-export const resultStatus = v.picklist(['INSUFFICIENT', 'EXACT', 'EXCESS'])
+export const settlementStatus = v.picklist(['INSUFFICIENT', 'EXACT', 'EXCESS'])
 export const depositStatus = v.picklist([
   'WAITING',
   'RECEIVING',
@@ -72,6 +72,17 @@ export const intent = v.object({
   amount,
 })
 
+export const settlement = v.intersect([
+  intent,
+  v.object({
+    receivedAmount: amount,
+    status: settlementStatus,
+    transactionHash: v.string(),
+    timestamp: v.string(),
+    contract: v.string(),
+  }),
+])
+
 export const depositParams = v.object({
   refundAddress: v.string(),
   intent,
@@ -97,18 +108,6 @@ export const deposit = v.object({
   intent,
 })
 
-export const result = v.object({
-  amount: v.string(),
-  rawAmount: v.string(),
-  status: resultStatus,
-})
-
-export const verification = v.object({
-  tx: v.string(),
-  intent,
-  result,
-})
-
 // --- types ---
 
 export type Uint = v.InferOutput<typeof uint>
@@ -129,28 +128,26 @@ export type Deposit = v.InferOutput<typeof deposit>
 
 export type IntentParams = v.InferOutput<typeof intentParams>
 export type Intent = v.InferOutput<typeof intent>
-
-export type Verification = v.InferOutput<typeof verification>
-export type ResultStatus = v.InferOutput<typeof resultStatus>
-export type Result = v.InferOutput<typeof result>
+export type Settlement = v.InferOutput<typeof settlement>
+export type SettlementStatus = v.InferOutput<typeof settlementStatus>
 
 export type Processed = {
+  id: string
+  address: Address
+  token: Address
+  recipient: Address
+  affiliate: Address
   chainId: number
-  address: string
-  affiliate: string
+  srcChainId: number
+  srcAddress: null
+  intentAmount: string
+  protocolAmount: string
   affiliateAmount: string
+  recipientAmount: string
+  transactionHash: string
   blockHash: string
   blockNumber: string
-  id: string
-  intentAmount: string
   logIndex: number
-  protocolAmount: string
-  recipient: string
-  recipientAmount: number
-  srcAddress: null
-  srcChainId: number
-  status: number
   timestamp: string
-  token: string
-  transactionHash: string
+  status: number
 }

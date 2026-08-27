@@ -1,5 +1,5 @@
 import { Big } from 'big.js'
-import type { ResultStatus } from './types'
+import type { SettlementStatus } from './types'
 
 export const EVM_MESSAGE_LENGTH_BYTES = 192
 export const EVM_GAS_BUDGET = 200_000
@@ -25,7 +25,7 @@ export const INTENT_ABI_PARAMS = [
   { type: 'bytes16' }, // id (nonce + hash)
 ] as const
 
-export const RESULT_STATUS: Record<number, ResultStatus> = {
+export const SETTLEMENT_STATUS: Record<number, SettlementStatus> = {
   0: 'INSUFFICIENT',
   1: 'EXACT',
   2: 'EXCESS',

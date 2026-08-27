@@ -101,7 +101,7 @@ describe('Intent', () => {
     const withAffiliate = new URL(buildUrl(affiliateIntent))
     const extra = new URL(buildUrl({ ...affiliateIntent, extra: 'extra' }))
 
-    expect(basic.origin).toBe('https://pay.seedpay.app')
+    expect(basic.origin).toBe('https://seedpay.app')
     expect(validate(basic.searchParams.get('id'))).toBe(true)
     expect(version(basic.searchParams.get('id')!)).toBe(7)
     expect(basic.searchParams.get('recipient')).toBe(recipient)
