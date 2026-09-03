@@ -1,12 +1,12 @@
 import { filterQuery, withQuery } from 'ufo'
 import { parse, stringify, v7 } from 'uuid'
 import * as v from 'valibot'
-import { encodeAbiParameters, keccak256, parseUnits, toBytes, toHex, zeroAddress } from 'viem'
+import { concatBytes, keccak256, parseUnits, stringToBytes, toBytes } from 'viem'
 
 import { ASSETS } from '../assets'
 import { DEFAULT_SEED_PAY_HOST } from '../configs'
-import { BASE_ABI_PARAMS } from '../constants'
 import { intent, intentParams } from '../types'
+import { validateAddress } from '../utils'
 
 import type { Intent, IntentParams } from '../types'
 
@@ -15,34 +15,48 @@ const NONCE_BYTES = 10
 
 export function createIntent(params: IntentParams): Intent {
   const parsed = v.parse(intentParams, params)
-  const { asset, amount, recipient, affiliate = zeroAddress } = parsed
+  const { asset, amount, recipient, affiliate } = parsed
+  const { chain, address, decimals } = ASSETS[asset]
 
-  const assetMeta = ASSETS[asset]
-  const chain = assetMeta.chain
-  const token = assetMeta.address
-  const units = parseUnits(amount, assetMeta.decimals)
+  if (!validateAddress(recipient, chain, false)) throw new Error('Recipient address is invalid')
+  if (affiliate && !validateAddress(affiliate, chain, false)) throw new Error('Affiliate address is invalid')
+
+  const chainBytes = stringToBytes(String(chain))
+  const tokenBytes = stringToBytes(address.toLowerCase().trim())
+  const recipientBytes = stringToBytes(recipient.toLowerCase())
+  const affiliateBytes = affiliate ? stringToBytes(affiliate.toLowerCase()) : new Uint8Array(0)
+  const amountBytes = stringToBytes(parseUnits(amount, decimals).toString())
 
   const idBytes = parse(v7())
-  const nonce = toHex(idBytes.slice(0, NONCE_BYTES))
+  const nonceBytes = idBytes.slice(0, NONCE_BYTES)
 
-  const abi = encodeAbiParameters(BASE_ABI_PARAMS, [chain, token, recipient, affiliate, units, nonce])
-  const hashBytes = toBytes(keccak256(abi)).slice(0, HASH_BYTES)
+  const payload = concatBytes([chainBytes, tokenBytes, recipientBytes, affiliateBytes, amountBytes, nonceBytes])
+  const hashBytes = toBytes(keccak256(payload)).slice(0, HASH_BYTES)
+
   idBytes.set(hashBytes, NONCE_BYTES)
+  const id = stringify(idBytes)
 
-  return { id: stringify(idBytes), asset, recipient, affiliate, amount }
+  return { id, asset, recipient, ...(affiliate && { affiliate }), amount }
 }
 
 export function verifyIntent(params: Intent): boolean {
   const parsed = v.parse(intent, params)
-  const { chain, address, decimals } = ASSETS[parsed.asset]
-  const { id, recipient, affiliate = zeroAddress } = parsed
+  const { asset, amount, recipient, affiliate, id } = parsed
+  const { chain, address, decimals } = ASSETS[asset]
 
-  const units = parseUnits(parsed.amount, decimals)
+  if (!validateAddress(recipient, chain, false)) return false
+  if (affiliate && !validateAddress(affiliate, chain, false)) return false
+
   const idBytes = parse(id)
-  const nonce = toHex(idBytes.slice(0, NONCE_BYTES))
+  const chainBytes = stringToBytes(String(chain))
+  const tokenBytes = stringToBytes(address.toLowerCase().trim())
+  const recipientBytes = stringToBytes(recipient.toLowerCase())
+  const affiliateBytes = affiliate ? stringToBytes(affiliate.toLowerCase()) : new Uint8Array(0)
+  const amountBytes = stringToBytes(parseUnits(amount, decimals).toString())
+  const nonceBytes = idBytes.slice(0, NONCE_BYTES)
 
-  const abi = encodeAbiParameters(BASE_ABI_PARAMS, [chain, address, recipient, affiliate, units, nonce])
-  const hashBytes = toBytes(keccak256(abi)).slice(0, HASH_BYTES)
+  const payload = concatBytes([chainBytes, tokenBytes, recipientBytes, affiliateBytes, amountBytes, nonceBytes])
+  const hashBytes = toBytes(keccak256(payload)).slice(0, HASH_BYTES)
 
   const expectedBytes = new Uint8Array(16)
   expectedBytes.set(idBytes.slice(0, NONCE_BYTES), 0)
@@ -58,7 +72,7 @@ export function buildIntentUrl(params: Intent & Record<string, string>, host: st
     id,
     ...(asset !== 'ARB.USDC' && { asset }),
     recipient,
-    ...(affiliate !== zeroAddress && { affiliate }),
+    ...(!!affiliate && { affiliate }),
     amount,
     ...extra,
   }

@@ -1,9 +1,6 @@
 import * as v from 'valibot'
-import { isAddress, zeroAddress } from 'viem'
 
 import { ASSET_LIST, ASSETS, DESTINATION_ASSETS } from './assets'
-
-import type { Address } from 'viem'
 
 // --- primitives ---
 
@@ -23,16 +20,6 @@ export const depositStatus = v.picklist([
 
 export const uint = v.pipe(v.string(), v.regex(/^(0|[1-9]\d*)$/, 'Must be an unsigned integer'))
 export const amount = v.pipe(v.string(), v.regex(/^(0|[1-9]\d*)(\.\d+)?$/, 'Must be a numeric amount'))
-
-export const address = v.pipe(
-  v.string(),
-  v.custom<Address>((v) => isAddress(v as string), 'Invalid address')
-)
-
-export const nonZeroAddress = v.pipe(
-  address,
-  v.custom((v) => v !== zeroAddress, 'Zero address not allowed')
-)
 
 export const id = v.pipe(
   v.string(),
@@ -59,28 +46,28 @@ export const quote = v.object({
 
 export const intentParams = v.object({
   asset: destAssetId,
-  recipient: nonZeroAddress,
-  affiliate: v.optional(address),
+  recipient: v.string(),
+  affiliate: v.optional(v.string()),
   amount,
 })
 
 export const intent = v.object({
   id,
   asset: destAssetId,
-  recipient: nonZeroAddress,
-  affiliate: address,
+  recipient: v.string(),
+  affiliate: v.optional(v.string()),
   amount,
 })
 
 export const settlement = v.object({
   id,
-  contract: address,
-  token: address,
-  recipient: address,
-  affiliate: address,
+  contract: v.string(),
+  token: v.string(),
+  recipient: v.string(),
+  affiliate: v.nullable(v.string()),
   chainId: v.number(),
   srcChainId: v.number(),
-  srcAddress: v.optional(v.string()),
+  srcAddress: v.nullable(v.string()),
   intentAmount: v.string(),
   protocolAmount: v.string(),
   affiliateAmount: v.string(),

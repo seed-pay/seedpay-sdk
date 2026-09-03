@@ -15,5 +15,6 @@ describe('Utils', () => {
     expect(validateAddress('0xdac17f958d2', ChainEnum.ETH)).toBe(false)
     expect(validateAddress('TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t', ChainEnum.SOL)).toBe(false)
     expect(validateAddress('Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB', ChainEnum.TRX)).toBe(false)
+    expect(validateAddress('0'.repeat(34), ChainEnum.TRX)).toBe(false)
   })
 })

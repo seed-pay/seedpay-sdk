@@ -1,17 +1,19 @@
 import { checkAddress } from '@polkadot/util-crypto'
 import { Network, validate } from 'bitcoin-address-validation'
-import { formatUnits, isAddress } from 'viem'
+import { formatUnits, isAddress, zeroAddress } from 'viem'
 
 import { isSolanaAddress, isTronAddress } from './address'
 import { ASSETS, ChainEnum, DESTINATION_ASSETS } from './assets'
 
 import type { AssetId, Chain, DestAsset, Payment, PaymentStatus, Settlement } from './types'
 
-export const validateAddress = (address: string, chain: Chain): boolean => {
+export const validateAddress = (address: string, chain: Chain, allowZero: boolean = true): boolean => {
   if (chain === ChainEnum.BTC) return validate(address, Network.mainnet)
   if (chain === ChainEnum.SOL) return isSolanaAddress(address)
   if (chain === ChainEnum.TRX) return isTronAddress(address)
   if (chain === ChainEnum.DOT) return checkAddress(address, 0)[0]
+  // EVM chains
+  if (!allowZero && address.toLowerCase() === zeroAddress) return false
   return !!isAddress(address)
 }
 
@@ -50,5 +52,5 @@ export const mapToPayment = (settlements: Settlement[]): Payment | null => {
     status = 'EXCESS'
   }
 
-  return { id, asset, recipient, affiliate, amount, totalAmount, status, settlements }
+  return { id, asset, recipient, ...(affiliate && { affiliate }), amount, totalAmount, status, settlements }
 }

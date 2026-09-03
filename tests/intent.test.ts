@@ -32,6 +32,7 @@ describe('Intent', () => {
   test('Create Intent With Zero Recipient', () => {
     const amount = '0.1'
     expect(() => createIntent({ asset: 'ARB.USDC', amount, recipient: zero, affiliate })).toThrow()
+    expect(() => createIntent({ asset: 'ARB.USDC', amount, recipient, affiliate: zero })).toThrow()
   })
 
   test('Create Intent Without Affiliate', () => {
@@ -41,7 +42,7 @@ describe('Intent', () => {
     expect(validate(i.id)).toBe(true)
     expect(version(i.id)).toBe(7)
     expect(i.recipient).toBe(recipient)
-    expect(i.affiliate).toBe(zero)
+    expect(i.affiliate).toBe(undefined)
     expect(i.amount).toBe(amount)
     expect(i.asset).toBe('ARB.USDC')
   })
