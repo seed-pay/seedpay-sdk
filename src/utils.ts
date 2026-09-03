@@ -5,8 +5,7 @@ import { formatUnits, isAddress } from 'viem'
 import { isSolanaAddress, isTronAddress } from './address'
 import { ASSETS, ChainEnum, DESTINATION_ASSETS } from './assets'
 
-import { SETTLEMENT_STATUS } from './constants'
-import type { AssetId, Chain, DestAsset, Processed, Settlement } from './types'
+import type { AssetId, Chain, DestAsset, Payment, PaymentStatus, Settlement } from './types'
 
 export const validateAddress = (address: string, chain: Chain): boolean => {
   if (chain === ChainEnum.BTC) return validate(address, Network.mainnet)
@@ -25,40 +24,31 @@ export const getAssetByAddress = (address: string, chain: Chain): AssetId | null
   return (entry?.[0] as AssetId) ?? null
 }
 
-export const mapToSettlement = (processed: Processed): Settlement | null => {
-  const {
-    id,
-    token,
-    chainId,
-    intentAmount,
-    recipientAmount,
-    recipient,
-    affiliate,
-    transactionHash,
-    timestamp,
-    address: contract,
-  } = processed
+export const mapToPayment = (settlements: Settlement[]): Payment | null => {
+  const settlement = settlements.at(0)
+  if (!settlement) return null
 
-  const asset = getAssetByAddress(token, chainId) as DestAsset | null
+  const asset = getAssetByAddress(settlement.token, settlement.chainId) as DestAsset | null
 
-  if (!asset) return null
-  if (!DESTINATION_ASSETS.includes(asset)) return null
-
+  if (!asset || !DESTINATION_ASSETS.includes(asset)) return null
   const assetDef = ASSETS[asset]
-  const amount = formatUnits(BigInt(intentAmount), assetDef.decimals)
-  const receivedAmount = formatUnits(BigInt(recipientAmount), assetDef.decimals)
-  const status = SETTLEMENT_STATUS[processed.status] ?? 'INSUFFICIENT'
 
-  return {
-    id,
-    asset,
-    recipient,
-    affiliate,
-    amount,
-    receivedAmount,
-    transactionHash,
-    timestamp,
-    contract,
-    status,
+  const { id, intentAmount, recipient, affiliate } = settlement
+
+  const totalUnits = settlements.reduce((sum, { recipientAmount }) => sum + BigInt(recipientAmount), 0n)
+  const amountUnits = BigInt(intentAmount)
+
+  const amount = formatUnits(amountUnits, assetDef.decimals)
+  const totalAmount = formatUnits(totalUnits, assetDef.decimals)
+
+  let status: PaymentStatus
+  if (totalUnits < amountUnits) {
+    status = 'INSUFFICIENT'
+  } else if (totalUnits === amountUnits) {
+    status = 'EXACT'
+  } else {
+    status = 'EXCESS'
   }
+
+  return { id, asset, recipient, affiliate, amount, totalAmount, status, settlements }
 }

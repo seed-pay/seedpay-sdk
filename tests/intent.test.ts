@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test } from 'bun:test'
 import { validate, version } from 'uuid'
 import { hexToBytes, type Address } from 'viem'
 
-import { buildUrl, createIntent, decodeAbi, encodeAbi, verifyIntent } from '../src'
+import { buildIntentUrl, createIntent, decodeAbi, encodeAbi, verifyIntent } from '../src'
 
 import { addr } from './helpers'
 
@@ -97,9 +97,9 @@ describe('Intent', () => {
     const intent = createIntent({ asset: 'ARB.USDC', amount: '0.2', recipient })
     const affiliateIntent = createIntent({ asset: 'ARB.USDC', amount: '0.2', recipient, affiliate })
 
-    const basic = new URL(buildUrl(intent))
-    const withAffiliate = new URL(buildUrl(affiliateIntent))
-    const extra = new URL(buildUrl({ ...affiliateIntent, extra: 'extra' }))
+    const basic = new URL(buildIntentUrl(intent))
+    const withAffiliate = new URL(buildIntentUrl(affiliateIntent))
+    const extra = new URL(buildIntentUrl({ ...affiliateIntent, extra: 'extra' }))
 
     expect(basic.origin).toBe('https://seedpay.app')
     expect(validate(basic.searchParams.get('id'))).toBe(true)

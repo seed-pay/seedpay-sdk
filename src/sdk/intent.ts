@@ -50,7 +50,7 @@ export function verifyIntent(params: Intent): boolean {
   return stringify(expectedBytes) === id
 }
 
-export function buildUrl(params: Intent & Record<string, string>, host: string = DEFAULT_SEED_PAY_HOST): string {
+export function buildIntentUrl(params: Intent & Record<string, string>, host: string = DEFAULT_SEED_PAY_HOST): string {
   const { asset, affiliate, ...rest } = params
   const { amount, recipient, id, ...extra } = rest
 

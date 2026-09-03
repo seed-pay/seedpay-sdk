@@ -3,12 +3,12 @@ import { validate } from 'uuid'
 import { fromHex, toHex } from 'viem/utils'
 
 import { Chainflip } from '../providers'
-import { mapToSettlement } from '../utils'
+import { mapToPayment } from '../utils'
 import { encodeAbi } from './abi'
 
 import { DEFAULT_CHAINFLIP_API, DEFAULT_CHAINFLIP_RPC, DEFAULT_SEED_API } from '../configs'
 
-import type { Deposit, DepositParams, Processed, Quote, QuoteParams, Settlement } from '../types'
+import type { Deposit, DepositParams, Payment, Quote, QuoteParams, Settlement } from '../types'
 
 type SeedpayConfig = {
   chainflipRpc?: string
@@ -49,16 +49,16 @@ export class SeedpayApi {
     return this.#chainflip.getDeposit(fromHex(`0x${id}`, 'string'))
   }
 
-  async getById(id: string): Promise<Settlement[]> {
+  async getPayment(id: string): Promise<Payment | null> {
     try {
-      if (!validate(id)) return []
-      const url = withQuery(joinURL(this.#api, 'processed'), { id: `eq.${id}` })
+      if (!validate(id)) return null
+      const url = withQuery(joinURL(this.#api, 'settlements'), { id: `eq.${id}` })
       const response = await fetch(url)
-      if (!response.ok) return []
-      const events = (await response.json()) as Processed[]
-      return events.map(mapToSettlement).filter((item) => !!item)
+      if (!response.ok) return null
+      const settlements = (await response.json()) as Settlement[]
+      return mapToPayment(settlements)
     } catch {
-      return []
+      return null
     }
   }
 }

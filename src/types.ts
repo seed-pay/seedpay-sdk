@@ -9,7 +9,7 @@ import type { Address } from 'viem'
 
 export const asset = v.picklist(ASSET_LIST)
 export const destAssetId = v.picklist(DESTINATION_ASSETS)
-export const settlementStatus = v.picklist(['INSUFFICIENT', 'EXACT', 'EXCESS'])
+export const paymentStatus = v.picklist(['INSUFFICIENT', 'EXACT', 'EXCESS'])
 export const depositStatus = v.picklist([
   'WAITING',
   'RECEIVING',
@@ -72,14 +72,33 @@ export const intent = v.object({
   amount,
 })
 
-export const settlement = v.intersect([
+export const settlement = v.object({
+  id,
+  contract: address,
+  token: address,
+  recipient: address,
+  affiliate: address,
+  chainId: v.number(),
+  srcChainId: v.number(),
+  srcAddress: v.optional(v.string()),
+  intentAmount: v.string(),
+  protocolAmount: v.string(),
+  affiliateAmount: v.string(),
+  recipientAmount: v.string(),
+  transactionHash: v.string(),
+  blockHash: v.string(),
+  blockNumber: v.string(),
+  logIndex: v.number(),
+  timestamp: v.string(),
+  status: v.number(),
+})
+
+export const payment = v.intersect([
   intent,
   v.object({
-    receivedAmount: amount,
-    status: settlementStatus,
-    transactionHash: v.string(),
-    timestamp: v.string(),
-    contract: v.string(),
+    totalAmount: amount,
+    status: paymentStatus,
+    settlements: v.array(settlement),
   }),
 ])
 
@@ -129,25 +148,5 @@ export type Deposit = v.InferOutput<typeof deposit>
 export type IntentParams = v.InferOutput<typeof intentParams>
 export type Intent = v.InferOutput<typeof intent>
 export type Settlement = v.InferOutput<typeof settlement>
-export type SettlementStatus = v.InferOutput<typeof settlementStatus>
-
-export type Processed = {
-  id: string
-  address: Address
-  token: Address
-  recipient: Address
-  affiliate: Address
-  chainId: number
-  srcChainId: number
-  srcAddress: null
-  intentAmount: string
-  protocolAmount: string
-  affiliateAmount: string
-  recipientAmount: string
-  transactionHash: string
-  blockHash: string
-  blockNumber: string
-  logIndex: number
-  timestamp: string
-  status: number
-}
+export type Payment = v.InferOutput<typeof payment>
+export type PaymentStatus = v.InferOutput<typeof paymentStatus>
