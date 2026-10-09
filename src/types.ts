@@ -4,8 +4,8 @@ import { ASSET_LIST, ASSETS, DESTINATION_ASSETS } from './assets'
 
 // --- primitives ---
 
-export const asset = v.picklist(ASSET_LIST)
-export const destAssetId = v.picklist(DESTINATION_ASSETS)
+export const asset = v.picklist(ASSET_LIST, 'Asset is not supported')
+export const destAssetId = v.picklist(DESTINATION_ASSETS, 'Asset is not supported')
 export const paymentStatus = v.picklist(['INSUFFICIENT', 'EXACT', 'EXCESS'])
 export const depositStatus = v.picklist([
   'WAITING',

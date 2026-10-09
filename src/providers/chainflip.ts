@@ -142,7 +142,7 @@ export class Chainflip {
       ccmParams: { message, gasBudget: String(EVM_GAS_BUDGET) },
       srcAsset: { chain: CHAINFLIP_CHAINS[srcAsset.chain], asset: srcAsset.symbol },
       destAsset: { chain: CHAINFLIP_CHAINS[destAsset.chain], asset: destAsset.symbol },
-      destAddress: DESTINATION_ADDRESSES['ARB.USDC'],
+      destAddress: DESTINATION_ADDRESSES[params.intent.asset],
       amount: params.quote.srcAmount,
       quote: params.quote.quote,
       fillOrKillParams: {

@@ -1,6 +1,6 @@
 import type { DestAsset } from './types'
 
-export const ARB_DESTINATION = '0x3a290686e199b94e223b5d19155802bb5fee242e' as const
+export const ARB_DESTINATION = '0x8c67c7468A0F9FB3d644850aC42B7b674f02F5DB' as const
 
 export const DEFAULT_CHAINFLIP_RPC = 'https://rpc.mainnet.chainflip.io' as const
 export const DEFAULT_CHAINFLIP_API = 'https://chainflip-swap.chainflip.io' as const

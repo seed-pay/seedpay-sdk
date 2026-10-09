@@ -1,6 +1,6 @@
 {
   "name": "@seedpay/sdk",
-  "homepage": "https://seedpay.app",
+  "homepage": "https://seedpay.io",
   "version": "0.0.8",
   "sideEffects": false,
   "type": "module",
