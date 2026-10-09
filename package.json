@@ -1,7 +1,7 @@
 {
   "name": "@seedpay/sdk",
   "homepage": "https://seedpay.io",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "sideEffects": false,
   "type": "module",
   "repository": {
